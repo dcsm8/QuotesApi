@@ -22,46 +22,59 @@ namespace QuotesApi.Controllers
 
         // GET: api/Quotes
         [HttpGet]
-        public IEnumerable<Quote> Get()
+        public IActionResult Get()
         {
-            return _quotesDbContext.Quotes;
+            return Ok(_quotesDbContext.Quotes);
         }
 
         // GET: api/Quotes/5
         [HttpGet("{id}", Name = "Get")]
-        public Quote Get(int id)
+        public IActionResult Get(int id)
         {
             var quote = _quotesDbContext.Quotes.Find(id);
-            return quote;
+            if (quote == null)
+                return NotFound();
+            return Ok(quote);
         }
 
         // POST: api/Quotes
         [HttpPost]
-        public void Post([FromBody] Quote quote)
+        public IActionResult Post([FromBody] Quote quote)
         {
             _quotesDbContext.Quotes.Add(quote);
             _quotesDbContext.SaveChanges();
+            return StatusCode(StatusCodes.Status201Created);
         }
 
         // PUT: api/Quotes/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Quote quote)
+        public IActionResult Put(int id, [FromBody] Quote quote)
         {
             var entity = _quotesDbContext.Quotes.Find(id);
+
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
             entity.Author = quote.Author;
             entity.Description = quote.Description;
             entity.Title = quote.Title;
 
             _quotesDbContext.SaveChanges();
+            return Ok();
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
             var quote = _quotesDbContext.Quotes.Find(id);
+            if (quote == null)
+                return NotFound();
             _quotesDbContext.Quotes.Remove(quote);
             _quotesDbContext.SaveChanges();
+            return Ok();
         }
     }
 }
